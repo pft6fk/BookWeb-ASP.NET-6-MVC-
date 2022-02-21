@@ -1,5 +1,4 @@
-﻿using BookWeb.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace BookWeb.DataAccess.Repository.IRepository
 {
-    public interface ICategoryRepository : IRepository<Category>
+    public interface IUnitOfWork
     {
-        void Update(Category category);
+        ICategoryRepository Category { get; }
+        ICoverTypeRepository CoverType{ get; }
+
+        void Save();
     }
 }

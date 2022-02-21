@@ -9,6 +9,7 @@ namespace BookWeb.DataAccess
         {        }
 
         public DbSet<Category> Categories { get; set; }
+        public DbSet<CoverType> CoverTypes{ get; set; }
 
     }
 }
