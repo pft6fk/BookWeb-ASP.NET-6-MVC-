@@ -1,4 +1,6 @@
 using BookWeb.DataAccess;
+using BookWeb.DataAccess.Repository;
+using BookWeb.DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,8 @@ builder.Services.AddControllersWithViews();
 //adding db to project
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")));
+//when object of ICategoryRepository is called, it will call the implementation of CategoryRepository
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 var app = builder.Build();
 
