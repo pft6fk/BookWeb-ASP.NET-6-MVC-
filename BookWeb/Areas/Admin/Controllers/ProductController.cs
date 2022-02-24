@@ -59,21 +59,14 @@ namespace BookWeb.Controllers
         //post
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(Product obj)
+        public IActionResult Upsert(ProductViewModel obj, IFormFile file)
         {
             if (ModelState.IsValid)
             {
-                if(obj.Id == 0)
-                {
-                    _unitOfWork.Product.Add(obj);
-                    TempData["success"] = "Product has benn created successfully";
-                }
-                else
-                {
-                    _unitOfWork.Product.Update(obj);
-                    _unitOfWork.Save();
-                    TempData["success"] = "Category edited successfully";
-                }
+            
+                _unitOfWork.Save();
+                TempData["success"] = "Category edited successfully";
+
                 return RedirectToAction("Index");
             }
             return View(obj);
