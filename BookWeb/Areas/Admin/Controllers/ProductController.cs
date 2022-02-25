@@ -21,8 +21,8 @@ namespace BookWeb.Controllers
         }
         public IActionResult Index()
         {
-            IEnumerable<Product> objProductList = _unitOfWork.Product.GetAll();
-            return View(objProductList);
+
+            return View();
         }
         //get
         public IActionResult Upsert(int? id)
@@ -52,7 +52,8 @@ namespace BookWeb.Controllers
             }
             else
             {//update product
-
+                productViewModel.Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == id);
+                return View(productViewModel);
             }
             
             return View(productViewModel);
@@ -73,6 +74,15 @@ namespace BookWeb.Controllers
                     var uploads = Path.Combine(wwwRootPath, @"images\products");
                     var extension = Path.GetExtension(file.FileName);
 
+                    if(obj.Product.ImageURL != null)
+                    {
+                        var oldImagePath = Path.Combine(wwwRootPath, obj.Product.ImageURL.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
                     //for copying file to wwwroot folder
                     using (var fileStreams = new FileStream(Path.Combine(uploads, fileName+extension), FileMode.Create))
                     {
@@ -81,8 +91,15 @@ namespace BookWeb.Controllers
 
                     obj.Product.ImageURL = @"\images\products\" + fileName + extension;
                 }
+                if(obj.Product.Id == 0)
+                {
+                    _unitOfWork.Product.Add(obj.Product);
+                }
+                else
+                {
+                    _unitOfWork.Product.Update(obj.Product);
+                }
 
-                _unitOfWork.Product.Add(obj.Product);
                 _unitOfWork.Save();
                 TempData["success"] = "Product created successfully";
 
@@ -126,5 +143,16 @@ namespace BookWeb.Controllers
             TempData["success"] = "Category deleted successfully";
             return RedirectToAction("Index");
         }
+
+
+        #region API CALLS
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var productList = _unitOfWork.Product.GetAll(includeProperties:"Category,CoverType");
+            return Json(new {data = productList});
+        }
+        #endregion
     }
+
 }
