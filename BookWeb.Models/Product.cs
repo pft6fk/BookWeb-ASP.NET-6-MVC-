@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -31,15 +32,16 @@ namespace BookWeb.Models
         [Required]
         [Range(1, 10000)]
         public double Price100 { get; set; }
-
-        [Required]
+        [ValidateNever]
         public string ImageURL { get; set; }
 
         [Required]
         public int CategoryID { get; set; }
+        [ValidateNever]
         public Category Category { get; set; }
         [Required]
         public int CoverTypeID { get; set; }
+        [ValidateNever]
         public CoverType CoverType{ get; set; }
 
 
