@@ -108,42 +108,6 @@ namespace BookWeb.Controllers
             return View(obj);
         }
 
-        //get
-        public IActionResult Delete(int? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-
-            var productFromDbFirst = _unitOfWork.Product.GetFirstOrDefault(q => q.Id == id);
-
-
-            if (productFromDbFirst == null)
-            {
-                return NotFound();
-            }
-
-            return View(productFromDbFirst);
-        }
-
-        //post
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeletePOST(int? id)
-        {
-            var obj = _unitOfWork.Product.GetFirstOrDefault(q => q.Id == id);
-            if (obj == null)
-            {
-                return NotFound();
-            }
-
-            _unitOfWork.Product.Remove(obj);
-            _unitOfWork.Save();
-            TempData["success"] = "Category deleted successfully";
-            return RedirectToAction("Index");
-        }
-
 
         #region API CALLS
         [HttpGet]
@@ -152,7 +116,30 @@ namespace BookWeb.Controllers
             var productList = _unitOfWork.Product.GetAll(includeProperties:"Category,CoverType");
             return Json(new {data = productList});
         }
+
+        //post
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            var obj = _unitOfWork.Product.GetFirstOrDefault(q => q.Id == id);
+            if (obj == null)
+            {
+                return Json(new { success = false, message = "Error while deleteng" });
+            }
+
+            var oldImagePath = Path.Combine(_hostEnvironment.WebRootPath, obj.ImageURL.TrimStart('\\'));
+            if (System.IO.File.Exists(oldImagePath))
+            {
+                System.IO.File.Delete(oldImagePath);
+            }
+
+            _unitOfWork.Product.Remove(obj);
+            _unitOfWork.Save();
+            TempData["success"] = "Product deleted successfully";
+            return Json(new { success = true, message = "Deleted successful!" });
+        }
+
         #endregion
     }
 
-}
+    }
